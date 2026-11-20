@@ -48,6 +48,9 @@ function validateTaskInput(body, { partial }) {
   }
 
   if (body.priority !== undefined) {
+    if (!Number.isInteger(body.priority) || body.priority < 1 || body.priority > 10) { // priority is an integer between 1 and 10
+      throw new HttpError(400, 'priority must be an integer between 1 and 10'); 
+    }
     data.priority = body.priority;
   }
 

@@ -11,7 +11,9 @@ function toDto(doc) {
     title: doc.title,
     description: doc.description ?? '',
     priority: doc.priority,
-    dueDate: doc.dueDate ?? null,
+    dueDate: doc.dueDate
+      ? doc.dueDate.toISOString().slice(0, 10)
+      : null,
     status: doc.status,
     createdAt: doc.createdAt,
   };
@@ -56,10 +58,17 @@ function validateTaskInput(body, { partial }) {
 
   // dueDate is optional - normalise "no due date" to null
   const dueDate = body.dueDate ? new Date(body.dueDate) : null;
-  if (dueDate && Number.isNaN(dueDate.getTime())) {
-    throw new HttpError(400, 'dueDate is not a valid date');
+  if (body.dueDate !== undefined) {
+    if (body.dueDate !== null &&
+        (typeof body.dueDate !== 'string' ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(body.dueDate))) { // dueDate must be a valid date string in YYYY-MM-DD format
+      throw new HttpError(400, 'dueDate must be a valid date');
+    }
+
+    data.dueDate = body.dueDate
+      ? new Date(`${body.dueDate}T00:00:00.000Z`)
+      : null;
   }
-  data.dueDate = dueDate;
 
   if (body.status !== undefined) {
     if (!STATUSES.includes(body.status)) {

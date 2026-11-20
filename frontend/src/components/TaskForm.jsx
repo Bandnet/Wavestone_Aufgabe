@@ -16,7 +16,7 @@ export default function TaskForm({ onCreate }) {
       title: form.title.trim(),
       description: form.description,
       priority: Number(form.priority), // priority is an integer between 1 and 10
-      dueDate: form.dueDate ? startOfDay(form.dueDate).toISOString() : null,
+      dueDate: form.dueDate || null, // ohne startOfDay
     });
     setForm(EMPTY);
   }

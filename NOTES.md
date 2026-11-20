@@ -2,15 +2,15 @@
 
 > Fülle diese Datei während der Arbeit aus. Kurz und ehrlich ist besser als lang und poliert.
 
-**Gewähltes Backend:** Node.js / Python _(eines löschen)_
+**Gewähltes Backend:** Node.js 
 
 ## Bugs
 
 | #   | Symptom                                    | Ursache | Fix (Dateien / was geändert) |
 | --- | ------------------------------------------ | ------- | ---------------------------- |
-| 1   |                                            |         |                              |
-| 2   |                                            |         |                              |
-| 3   |                                            |         |                              |
+| 1   |  Tasks weden nicht angezeigt im frontend                                          | fehlender await in tasks.js        |   tasks.js: den await hinzufügen                        |
+| 2   |  Tasks werden nicht priorisiert                                          |  Die nummer ist ein string une kein Number weswegen es falsch priorisiert wird       |  Task.js: (noch für anzeige tasksService.js TaskForm.jsx ) wechsle die Task prioritäts Nummer von string zu Number                           |
+| 3   |   Beim erstellen von Tasks mit duedate wurde der tag davor angezeigt                                         |  konventieren von reines Datum YYYY-MM-DD mit lokarer zeit zu UTC -> probleme mit zeitzone       |   Backend: taskService: Datum in UTC-Mitternacht validieren/konvertieren und toDto als YYYY-MM-DD ausgeben Frontend: date.js: Datums als String formatieren für anzeige                         |
 | 4   |                                            |         |                              |
 | 5   |                                            |         |                              |
 | 6   |                                            |         |                              |
@@ -42,3 +42,6 @@ _Welche Tests hast du geschrieben, und was decken sie ab?_
 | **Total** |      |
 
 ## Offene Punkte / was ich mit mehr Zeit machen würde
+
+
+Notiz für nacher: Tasks werden vom creat zeitpunkt nach priorität geordnet und nicht nach due date!!!

@@ -1,5 +1,6 @@
 const Task = require('../models/task');
 const { HttpError } = require('../errors');
+const mongoose = require('mongoose');
 
 const STATUSES = ['open', 'done'];
 
@@ -82,6 +83,12 @@ function validateTaskInput(body, { partial }) {
 
 // ---------- service functions ----------
 
+function validateTaskId(id) {
+  if (!mongoose.isValidObjectId(id)) {
+    throw new HttpError(400, 'Malformed task id');
+  }
+}
+
 async function listTasks() {
   // most important tasks first
   const docs = await Task.find().sort({ priority: -1, _id: -1 }).lean();
@@ -89,6 +96,7 @@ async function listTasks() {
 }
 
 async function getTask(id) {
+  validateTaskId(id);
   const doc = await Task.findById(id).lean();
   if (!doc) throw new HttpError(404, 'Task not found');
   return toDto(doc);
@@ -101,6 +109,7 @@ async function createTask(body) {
 }
 
 async function updateTask(id, body) {
+  validateTaskId(id);
   const data = validateTaskInput(body, { partial: true });
   const doc = await Task.findByIdAndUpdate(id, data, { new: true }).lean(); // return the updated document
   if (!doc) throw new HttpError(404, 'Task not found');
@@ -108,6 +117,7 @@ async function updateTask(id, body) {
 }
 
 async function deleteTask(id) {
+  validateTaskId(id);
   const doc = await Task.findByIdAndDelete(id).lean();
   if (!doc) throw new HttpError(404, 'Task not found');
 }

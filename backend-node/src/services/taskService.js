@@ -89,9 +89,46 @@ function validateTaskId(id) {
   }
 }
 
-async function listTasks() {
-  // most important tasks first
-  const docs = await Task.find().sort({ priority: -1, _id: -1 }).lean();
+async function listTasks(query) {
+  // Werte zuerst validieren
+  const filter = {};
+
+  if (query.status !== undefined) {
+    if (!['open', 'done'].includes(query.status)) {
+      throw new HttpError(400, "status must be 'open' or 'done'");
+    }
+    filter.status = query.status;
+  }
+
+  if (query.minPriority !== undefined) {
+    if (!/^\d+$/.test(query.minPriority)) {
+      throw new HttpError(400, 'minPriority must be an integer between 1 and 10');
+    }
+
+    const minPriority = Number(query.minPriority);
+    if (minPriority < 1 || minPriority > 10) {
+      throw new HttpError(400, 'minPriority must be an integer between 1 and 10');
+    }
+    filter.priority = { $gte: minPriority };
+  }
+
+  const sortFields = ['priority', 'dueDate', 'createdAt'];
+  const sort = sortFields.includes(query.sort) ? query.sort : 'priority';
+
+  if (query.sort !== undefined && !sortFields.includes(query.sort)) {
+    throw new HttpError(400, "sort must be 'priority', 'dueDate' or 'createdAt'");
+  }
+
+  const order = query.order ?? 'desc';
+  if (!['asc', 'desc'].includes(order)) {
+    throw new HttpError(400, "order must be 'asc' or 'desc'");
+  }
+
+  const direction = order === 'asc' ? 1 : -1;
+  const docs = await Task.find(filter)
+    .sort({ [sort]: direction, _id: -1 })
+    .lean();
+
   return docs.map(toDto);
 }
 

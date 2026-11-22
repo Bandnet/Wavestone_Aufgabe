@@ -50,3 +50,22 @@ describe('Bug 2 - priority sorting', () => {
     expect(res.body[1].priority).toBe(1);
   });
 });
+
+describe('priority filtering', () => {
+  it('only returns tasks with sufficient priority', async () => {
+    await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Priority 4', priority: 4 });
+
+    await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Priority 9', priority: 9 });
+
+    const res = await request(app)
+      .get('/api/tasks?minPriority=7');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].priority).toBe(9);
+  });
+});

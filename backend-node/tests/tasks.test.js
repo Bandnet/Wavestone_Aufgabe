@@ -69,3 +69,15 @@ describe('priority filtering', () => {
     expect(res.body[0].priority).toBe(9);
   });
 });
+
+describe('Bug 5 - malformed task id', () => {
+  it('returns 400 for a malformed id', async () => {
+    const res = await request(app).get('/api/tasks/123');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      error: 'Malformed task id',
+    });
+  });
+});
+  

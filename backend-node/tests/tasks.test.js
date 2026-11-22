@@ -30,3 +30,23 @@ describe('POST /api/tasks', () => {
     expect(res.body.id).toBeDefined();
   });
 });
+
+describe('Bug 2 - priority sorting', () => {
+  it('returns tasks from highest to lowest priority', async () => {
+    await request(app)
+      .post('/api/tasks')
+      .send({ title: 'Low priority', priority: 1 });
+
+    await request(app)
+      .post('/api/tasks')
+      .send({ title: 'High priority', priority: 10 });
+
+    const res = await request(app)
+      .get('/api/tasks?sort=priority&order=desc');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(2);
+    expect(res.body[0].priority).toBe(10);
+    expect(res.body[1].priority).toBe(1);
+  });
+});

@@ -80,4 +80,30 @@ describe('Bug 5 - malformed task id', () => {
     });
   });
 });
-  
+
+describe('Bug 6 - partial task update', () => {
+  it('preserves the due date when only the title is updated', async () => {
+    const created = await request(app)
+      .post('/api/tasks')
+      .send({
+        title: 'Original title',
+        dueDate: '2026-12-24',
+      });
+
+    expect(created.status).toBe(201);
+    expect(created.body.dueDate).toBe('2026-12-24');
+
+    const patched = await request(app)
+      .patch(`/api/tasks/${created.body.id}`)
+      .send({ title: 'Updated title' });
+
+    expect(patched.status).toBe(200);
+    expect(patched.body.title).toBe('Updated title');
+    expect(patched.body.dueDate).toBe('2026-12-24');
+
+    const reloaded = await request(app).get(`/api/tasks/${created.body.id}`);
+
+    expect(reloaded.status).toBe(200);
+    expect(reloaded.body.dueDate).toBe('2026-12-24');
+  });
+});

@@ -13,8 +13,16 @@ async function request(path, options = {}) {
   return data;
 }
 
-export function listTasks() {
-  return request('/tasks');
+export function listTasks(filters = {}) {
+  const params = new URLSearchParams();
+
+  if (filters.status) params.set('status', filters.status);
+  if (filters.minPriority) params.set('minPriority', filters.minPriority);
+  if (filters.sort) params.set('sort', filters.sort);
+  if (filters.order) params.set('order', filters.order);
+
+  const query = params.toString();
+  return request(`/tasks${query ? `?${query}` : ''}`);
 }
 
 export function createTask(task) {
